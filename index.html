@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Charlie's Chilli Cupboard</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<!-- pls css -->
+</head>
+<body>
+	<h1>Chilli Cupboard</h1>
+	<dl>
+		<dt>Temperature</dt>
+		<dd>{{ temperature }}</dd>
+	</dl>
+	<dl>
+		<dt>Humidity</dt>
+		<dd>{{ humidity }}</dd>
+	</dl>
+	<dl>
+		<dt>Lights on</dt>
+		<dd>{{ lights_on }}</dd>
+	</dl>
+	<dl>
+		<dt>Fan on</dt>
+		<dd>{{ fan_on }}</dd>
+	</dl>
+	<dl>
+		<dt>Record count</dt>
+		<dd>{{ count }}</dd>
+	</dl>
+
+	<canvas id="chart" width="3" height="1"></canvas>
+
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js" integrity="sha256-R4pqcOYV8lt7snxMQO/HSbVCFRPMdrhAFMH+vr9giYI=" crossorigin="anonymous"></script>
+	<script>
+		var ctx = document.getElementById('chart').getContext('2d');
+		var myChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: {{{ labels }}},
+				datasets: [
+					{
+						label: 'Temperature',
+						data: {{{ graphDataTemperature }}},
+					},
+					{
+						label: 'Humidity',
+						data: {{{ graphDataHumidity }}},
+					},
+				],
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true,
+						},
+					}],
+				},
+			},
+		});
+	</script>
+</body>
+</html>
