@@ -25,11 +25,11 @@ app.get('/', async (req, res) => {
 	const humidities = records.filter(r => r.key === 'humidity');
 
 	const latest = {
-		temperature: temperatures[temperatures.length - 1]?.value,
-		humidity: humidities[humidities.length - 1]?.value,
+		temperature: temperatures[0]?.value,
+		humidity: humidities[0]?.value,
 	};
 
-	const labels = Array.from(new Set(records.map(r => r.timestamp)));
+	const labels = Array.from(new Set(records.map(r => r.timestamp))).reverse();
 	const temperatureGraph = temperatures.map(convertToGraph);
 	const humidityGraph = humidities.map(convertToGraph);
 

@@ -24,7 +24,7 @@ export default class DB {
 			this.#db.all(`
 				SELECT timestamp, key, value
 				FROM data
-				ORDER BY timestamp ASC
+				ORDER BY timestamp DESC
 				LIMIT ?
 			`, limit, (error, rows) => {
 				if (error) return reject(error);
