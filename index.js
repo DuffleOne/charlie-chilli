@@ -1,69 +1,64 @@
-const fs = require('fs');
-const express = require('express');
-const bodyParser = require('body-parser');
-const Handlebars = require('handlebars');
+import DB from './db.js';
+import Handlebars from 'handlebars';
+import bodyParser from 'body-parser';
+import express from 'express';
+import fs from 'fs';
 
 const port = 8080;
 const app = express();
-const values = [];
-const latestRecords = 10;
+const limit = 20;
+
+const html = fs.readFileSync('./index.html', 'utf-8');
+const template = Handlebars.compile(html);
+
+const db = new DB('./database.sqlite');
 
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-	const html = fs.readFileSync('./index.html', 'utf-8');
-	const template = Handlebars.compile(html);
+app.get('/', async (req, res) => {
+	const [count, records] = await Promise.all([
+		db.count(),
+		db.list(limit),
+	]);
 
-	// TODO: load data from historical data source, such as SQLite
+	const temperatures = records.filter(r => r.key === 'temperature');
+	const humidities = records.filter(r => r.key === 'humidity');
 
-	const latest = values[values.length - 1];
-	const count = values.length;
+	const latest = {
+		temperature: temperatures[0]?.value,
+		humidity: humidities[0]?.value,
+	};
 
-	const labels = [];
-	const graphDataTemperature = [];
-	const graphDataHumidity = [];
-
-	for (const v of values) {
-		labels.push(v.time);
-
-		graphDataTemperature.push({
-			x: v.time,
-			y: v.temperature,
-		});
-
-		graphDataHumidity.push({
-			x: v.time,
-			y: v.humidity,
-		});
-	}
+	const labels = Array.from(new Set(records.map(r => r.timestamp))).reverse();
+	const temperatureGraph = temperatures.map(convertToGraph);
+	const humidityGraph = humidities.map(convertToGraph);
 
 	res.send(template({
-		...latest,
+		latest,
 		count,
-		graphDataTemperature: stringifyAndLimitData(graphDataTemperature),
-		graphDataHumidity: stringifyAndLimitData(graphDataHumidity),
-		labels: stringifyAndLimitData(labels),
+		labels: JSON.stringify(labels),
+		temperatureGraph: JSON.stringify(temperatureGraph),
+		humidityGraph: JSON.stringify(humidityGraph),
 	}));
 });
 
-function stringifyAndLimitData(array) {
-	const set = array.slice(Math.max(array.length - latestRecords, 0))
-
-	return JSON.stringify(set);
-}
-
 app.post('/', (req, res) => {
-	const body = req.body;
-
-	// TODO: save data to historical data source, such as SQLite
 	// TODO: validate input as right now, it'll accept literally anything
+	const { temperature, humidity } = req.body;
 
-	values.push({
-		time: (new Date()).toISOString(),
-		...body,
-	})
+	const now = new Date();
+
+	db.record(now.toISOString(), { key: 'temperature', value: temperature });
+	db.record(now.toISOString(), { key: 'humidity', value: humidity });
 
 	res.send(null);
 });
 
-app.listen(port, () => console.log(`App listening at http://localhost:${port}`))
+app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
+
+function convertToGraph(r) {
+	return {
+		x: r.timestamp,
+		y: r.value,
+	};
+}

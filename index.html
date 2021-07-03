@@ -10,19 +10,11 @@
 	<h1>Chilli Cupboard</h1>
 	<dl>
 		<dt>Temperature</dt>
-		<dd>{{ temperature }}</dd>
+		<dd>{{ latest.temperature }}</dd>
 	</dl>
 	<dl>
 		<dt>Humidity</dt>
-		<dd>{{ humidity }}</dd>
-	</dl>
-	<dl>
-		<dt>Lights on</dt>
-		<dd>{{ lights_on }}</dd>
-	</dl>
-	<dl>
-		<dt>Fan on</dt>
-		<dd>{{ fan_on }}</dd>
+		<dd>{{ latest.humidity }}</dd>
 	</dl>
 	<dl>
 		<dt>Record count</dt>
@@ -41,11 +33,11 @@
 				datasets: [
 					{
 						label: 'Temperature',
-						data: {{{ graphDataTemperature }}},
+						data: {{{ temperatureGraph }}},
 					},
 					{
 						label: 'Humidity',
-						data: {{{ graphDataHumidity }}},
+						data: {{{ humidityGraph }}},
 					},
 				],
 			},
