@@ -4,8 +4,8 @@ import sqlite3 from 'sqlite3';
 export default class DB {
 	#db;
 
-	constructor() {
-		this.#db = new sqlite3.Database('./database.sqlite');
+	constructor(source) {
+		this.#db = new sqlite3.Database(source);
 		this.#db.serialize(() => {
 			this.#db.run(`
 				CREATE TABLE IF NOT EXISTS data (
@@ -36,7 +36,10 @@ export default class DB {
 	// get a count of all records
 	async count() {
 		const result = await new Promise((resolve, reject) => {
-			this.#db.get('SELECT COUNT(*) count FROM data', (error, row) => {
+			this.#db.get(`
+				SELECT COUNT(*) count
+				FROM data`
+			, (error, row) => {
 				if (error) return reject(error);
 				resolve(row);
 			});
@@ -46,7 +49,7 @@ export default class DB {
 	}
 
 	// record data into the database
-	async record(timestamp, { temperature, humidity }) {
+	async record(timestamp, { key, value }) {
 		const stmt = this.#db.prepare(`
 			INSERT INTO data
 			(id, timestamp, key, value)
@@ -54,8 +57,7 @@ export default class DB {
 			(?, ?, ?, ?);
 		`);
 
-		stmt.run(ksuid.generate('data').toString(), timestamp, 'temperature', temperature);
-		stmt.run(ksuid.generate('data').toString(), timestamp, 'humidity', humidity);
+		stmt.run(ksuid.generate('data').toString(), timestamp, key, value);
 		stmt.finalize();
 	}
 }

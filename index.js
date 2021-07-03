@@ -11,7 +11,7 @@ const limit = 20;
 const html = fs.readFileSync('./index.html', 'utf-8');
 const template = Handlebars.compile(html);
 
-const db = new DB();
+const db = new DB('./database.sqlite');
 
 app.use(bodyParser.json());
 
@@ -46,12 +46,15 @@ app.post('/', (req, res) => {
 	// TODO: validate input as right now, it'll accept literally anything
 	const { temperature, humidity } = req.body;
 
-	db.record(new Date().toISOString(), { temperature, humidity });
+	const now = new Date();
+
+	db.record(now.toISOString(), { key: 'temperature', value: temperature });
+	db.record(now.toISOString(), { key: 'humidity', value: humidity });
 
 	res.send(null);
 });
 
-app.listen(port, () => console.log(`App listening at http://localhost:${port}`))
+app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
 
 function convertToGraph(r) {
 	return {
