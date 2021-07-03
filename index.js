@@ -1,8 +1,14 @@
 import DB from './db.js';
 import Handlebars from 'handlebars';
 import bodyParser from 'body-parser';
+import { createRequire } from 'module';
 import express from 'express';
 import fs from 'fs';
+import validator from 'is-my-json-valid';
+import { rsort } from 'semver';
+
+const schemaDef = createRequire(import.meta.url)('./validator.json');
+const validate = validator(schemaDef, { verbose: true });
 
 const port = 8080;
 const app = express();
@@ -42,14 +48,21 @@ app.get('/', async (req, res) => {
 	}));
 });
 
-app.post('/', (req, res) => {
-	// TODO: validate input as right now, it'll accept literally anything
+app.post('/', async (req, res) => {
+	if (!validate(req.body)) {
+		res.status(400).send(validate.errors);
+
+		return;
+	}
+
 	const { temperature, humidity } = req.body;
 
 	const now = new Date();
 
-	db.record(now.toISOString(), { key: 'temperature', value: temperature });
-	db.record(now.toISOString(), { key: 'humidity', value: humidity });
+	await Promise.all([
+		db.record(now.toISOString(), { key: 'temperature', value: temperature }),
+		db.record(now.toISOString(), { key: 'humidity', value: humidity }),
+	]);
 
 	res.send(null);
 });

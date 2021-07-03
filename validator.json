@@ -1,0 +1,21 @@
+{
+	"type": "object",
+	"additionalProperties": false,
+
+	"required": [
+		"temperature",
+		"humidity"
+	],
+
+	"properties": {
+		"temperature": {
+			"type": "number",
+			"minimum": 0
+		},
+
+		"humidity": {
+			"type": "number",
+			"minimum": 0
+		}
+	}
+}
