@@ -1,6 +1,19 @@
 {
-  "dependencies": {
-    "express": "^4.17.1",
-    "handlebars": "^4.7.7"
-  }
+	"private": true,
+	"name": "charlie-chilli",
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"start": "node index.js"
+	},
+	"dependencies": {
+		"@cuvva/ksuid": "^1.0.0",
+		"express": "^4.17.1",
+		"handlebars": "^4.7.7",
+		"sqlite3": "^5.0.2"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.14.6",
+		"@babel/eslint-parser": "^7.14.7"
+	}
 }
