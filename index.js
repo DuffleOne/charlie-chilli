@@ -25,9 +25,10 @@ const db = new DB('./database.sqlite');
 app.use(bodyParser.json());
 
 app.get('/', async (req, res) => {
-	const [count, records] = await Promise.all([
+	const [count, records, state] = await Promise.all([
 		db.count(),
 		db.list(limit),
+		db.getState(),
 	]);
 
 	const temperatures = records.filter(r => r.key === 'temperature');
@@ -44,6 +45,7 @@ app.get('/', async (req, res) => {
 
 	res.send(template({
 		latest,
+		state,
 		count,
 		labels: JSON.stringify(labels),
 		temperatureGraph: JSON.stringify(temperatureGraph),

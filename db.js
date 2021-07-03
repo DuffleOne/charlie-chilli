@@ -73,6 +73,20 @@ export default class DB {
 		});
 	}
 
+	async getState() {
+		const rows = await new Promise((resolve, reject) => {
+			this.#db.all(`
+				SELECT *
+				FROM state`
+			, (error, row) => {
+				if (error) return reject(error);
+				resolve(row);
+			});
+		});
+
+		return rows.reduce((p, c) => ({ ...p, [c.key]: c.value }), {});
+	}
+
 	async setState(timestamp, key, value) {
 		const stmt = this.#db.prepare(`
 			INSERT INTO state (key, value, updatedAt)
