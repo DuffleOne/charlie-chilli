@@ -50,7 +50,7 @@ app.get('/', async (req, res) => {
 
 app.post('/', (req, res) => {
 	if (!validate(req.body)) {
-		res.send(400, validate.errors);
+		res.status(400).send(validate.errors);
 
 		return;
 	}
