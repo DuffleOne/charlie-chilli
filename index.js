@@ -5,7 +5,6 @@ import { createRequire } from 'module';
 import express from 'express';
 import fs from 'fs';
 import validator from 'is-my-json-valid';
-import { rsort } from 'semver';
 
 const schemaDef = createRequire(import.meta.url)('./validator.json');
 const validate = validator(schemaDef, { verbose: true });
