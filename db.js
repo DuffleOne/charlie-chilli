@@ -57,7 +57,12 @@ export default class DB {
 			(?, ?, ?, ?);
 		`);
 
-		stmt.run(ksuid.generate('data').toString(), timestamp, key, value);
-		stmt.finalize();
+		return new Promise((resolve, reject) => {
+			stmt.run(ksuid.generate('data').toString(), timestamp, key, value, error => {
+				if (error) return reject(error);
+				resolve();
+			});
+			stmt.finalize();
+		});
 	}
 }

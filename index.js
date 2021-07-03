@@ -48,7 +48,7 @@ app.get('/', async (req, res) => {
 	}));
 });
 
-app.post('/', (req, res) => {
+app.post('/', async (req, res) => {
 	if (!validate(req.body)) {
 		res.status(400).send(validate.errors);
 
@@ -59,8 +59,10 @@ app.post('/', (req, res) => {
 
 	const now = new Date();
 
-	db.record(now.toISOString(), { key: 'temperature', value: temperature });
-	db.record(now.toISOString(), { key: 'humidity', value: humidity });
+	await Promise.all([
+		db.record(now.toISOString(), { key: 'temperature', value: temperature }),
+		db.record(now.toISOString(), { key: 'humidity', value: humidity }),
+	]);
 
 	res.send(null);
 });
