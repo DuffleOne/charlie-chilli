@@ -13,6 +13,7 @@ const port = 8080;
 const app = express();
 const limit = 20;
 
+// eslint-disable-next-line no-sync
 const html = fs.readFileSync('./index.html', 'utf-8');
 const template = Handlebars.compile(html);
 
@@ -66,6 +67,7 @@ app.post('/', async (req, res) => {
 	res.send(null);
 });
 
+// eslint-disable-next-line no-console
 app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
 
 function convertToGraph(r) {
