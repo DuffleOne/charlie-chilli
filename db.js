@@ -9,10 +9,17 @@ export default class DB {
 		this.#db.serialize(() => {
 			this.#db.run(`
 				CREATE TABLE IF NOT EXISTS data (
-					id text PRIMARY KEY,
+					id TEXT PRIMARY KEY,
 					timestamp TEXT NOT NULL,
 					key TEXT NOT NULL,
 					value TEXT NOT NULL
+				) WITHOUT ROWID;
+			`);
+			this.#db.run(`
+				CREATE TABLE IF NOT EXISTS state (
+					key TEXT PRIMARY KEY,
+					value TEXT NOT NULL,
+					updatedAt TEXT NOT NULL
 				) WITHOUT ROWID;
 			`);
 		});
@@ -59,6 +66,28 @@ export default class DB {
 
 		return new Promise((resolve, reject) => {
 			stmt.run(ksuid.generate('data').toString(), timestamp, key, value, error => {
+				if (error) return reject(error);
+				resolve();
+			});
+			stmt.finalize();
+		});
+	}
+
+	async setState(timestamp, key, value) {
+		const stmt = this.#db.prepare(`
+			INSERT INTO state (key, value, updatedAt)
+			VALUES ($key, $value, $timestamp)
+			ON CONFLICT(key) DO UPDATE SET
+				value = $value,
+				updatedAt = $timestamp
+		`);
+
+		return new Promise((resolve, reject) => {
+			stmt.run({
+				$key: key,
+				$value: value,
+				$timestamp: timestamp,
+			}, error => {
 				if (error) return reject(error);
 				resolve();
 			});
