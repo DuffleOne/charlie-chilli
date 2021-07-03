@@ -10,12 +10,14 @@
 	"properties": {
 		"temperature": {
 			"type": "number",
-			"minimum": 0
+			"minimum": -50,
+			"maximum": 200
 		},
 
 		"humidity": {
 			"type": "number",
-			"minimum": 0
+			"minimum": 0,
+			"maximum": 100
 		}
 	}
 }
